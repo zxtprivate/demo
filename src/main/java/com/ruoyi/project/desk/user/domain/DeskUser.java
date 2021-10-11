@@ -15,6 +15,7 @@ public class DeskUser extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
+
     /** 主键 */
     private Long id;
 
@@ -33,6 +34,14 @@ public class DeskUser extends BaseEntity
     /** 邮箱 */
     @Excel(name = "邮箱")
     private String email;
+
+    /** qq */
+    @Excel(name = "qq")
+    private String qq;
+
+    /** 籍贯 */
+    @Excel(name = "籍贯")
+    private Integer region;
 
     public void setId(Long id)
     {
@@ -79,17 +88,37 @@ public class DeskUser extends BaseEntity
     {
         return email;
     }
+    public void setQq(String qq)
+    {
+        this.qq = qq;
+    }
+
+    public String getQq()
+    {
+        return qq;
+    }
+    public void setRegion(Integer region)
+    {
+        this.region = region;
+    }
+
+    public Integer getRegion()
+    {
+        return region;
+    }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("name", getName())
-            .append("gender", getGender())
-            .append("age", getAge())
-            .append("email", getEmail())
-            .append("createTime", getCreateTime())
-            .append("updateTime", getUpdateTime())
-            .toString();
+                .append("id", getId())
+                .append("name", getName())
+                .append("gender", getGender())
+                .append("age", getAge())
+                .append("email", getEmail())
+                .append("createTime", getCreateTime())
+                .append("qq", getQq())
+                .append("region", getRegion())
+                .append("updateTime", getUpdateTime())
+                .toString();
     }
 }

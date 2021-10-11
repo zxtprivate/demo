@@ -23,38 +23,38 @@ import java.util.List;
  * @date 2021-10-11
  */
 @Controller
-@RequestMapping("/user/user")
+@RequestMapping("/port/user")
 public class DeskUserController extends BaseController
 {
-    private String prefix = "user/user";
+    private String prefix = "desk/user";
 
     @Autowired
     private IDeskUserService deskUserService;
 
-    @RequiresPermissions("user:user:view")
     @GetMapping()
     public String user()
     {
-        return prefix + "/user";
+        return prefix + "/index";
     }
 
+    @GetMapping("/list")
+    public String pageList(){
+        return prefix + "/list";
+    }
     /**
      * 查询用户管理列表
      */
-    @RequiresPermissions("user:user:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(DeskUser deskUser)
+    public List<DeskUser> list(DeskUser deskUser)
     {
-        startPage();
         List<DeskUser> list = deskUserService.selectDeskUserList(deskUser);
-        return getDataTable(list);
+        return list;
     }
 
     /**
      * 导出用户管理列表
      */
-    @RequiresPermissions("user:user:export")
     @Log(title = "用户管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     @ResponseBody
@@ -77,7 +77,6 @@ public class DeskUserController extends BaseController
     /**
      * 新增保存用户管理
      */
-    @RequiresPermissions("user:user:add")
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
@@ -100,7 +99,6 @@ public class DeskUserController extends BaseController
     /**
      * 修改保存用户管理
      */
-    @RequiresPermissions("user:user:edit")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
@@ -112,7 +110,6 @@ public class DeskUserController extends BaseController
     /**
      * 删除用户管理
      */
-    @RequiresPermissions("user:user:remove")
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @PostMapping( "/remove")
     @ResponseBody
