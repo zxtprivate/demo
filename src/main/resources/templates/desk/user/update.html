@@ -1,64 +1,147 @@
 <!DOCTYPE html>
 <!-- 网页使用的语言 -->
-<html lang="zh-CN">
-    <head>
-    	<base href="<%=basePath%>"/>
-        <!-- 指定字符集 -->
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>修改用户</title>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <base href="<%=basePath%>"/>
+    <!-- 指定字符集 -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>修改用户</title>
 
-        <link href="css/bootstrap.min.css" rel="stylesheet">
-        <script src="js/jquery-2.1.0.min.js"></script>
-        <script src="js/bootstrap.min.js"></script>
-        
-    </head>
-    <body>
-        <div class="container" style="width: 400px;">
-        <h3 style="text-align: center;">修改联系人</h3>
-        <form action="" method="post">
-          <div class="form-group">
+    <!-- 1. 导入CSS的全局样式 -->
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <!--    <link href="css/bootstrap.min.css" rel="stylesheet">-->
+    <!-- 2. jQuery导入，建议使用1.9以上的版本 -->
+    <script th:src="@{/js/jquery-2.1.0.min.js}"></script>
+    <!--    <script src="js/jquery-2.1.0.min.js"></script>-->
+    <!-- 3. 导入bootstrap的js文件 -->
+    <script rel="stylesheet" th:src="@{/js/bootstrap.min.js}"></script>
+    <style>
+        .error {
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+<div class="container" style="width: 400px;">
+    <h3 style="text-align: center;">修改联系人</h3>
+    <form  id="form-user-edit" th:object="${deskUser}">
+        <input name="id" th:field="*{id}" type="hidden">
+        <div class="form-group">
             <label for="name">姓名：</label>
-            <input type="text" class="form-control" id="name" name="name"  readonly="readonly" placeholder="请输入姓名" />
-          </div>
-
-          <div class="form-group">
-            <label>性别：</label>
-              <input type="radio" name="sex" value="男"  />男
-                <input type="radio" name="sex" value="女"  />女
-          </div>
-
-          <div class="form-group">
-            <label for="age">年龄：</label>
-            <input type="text" class="form-control" id="age"  name="age" placeholder="请输入年龄" />
-          </div>
-
-          <div class="form-group">
-            <label for="address">籍贯：</label>
-             <select name="address" class="form-control" >
-                <option value="广东">广东</option>
-                <option value="广西">广西</option>
-                <option value="湖南">湖南</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="qq">QQ：</label>
-            <input type="text" class="form-control" name="qq" placeholder="请输入QQ号码"/>
-          </div>
-
-          <div class="form-group">
-            <label for="email">Email：</label>
-            <input type="text" class="form-control" name="email" placeholder="请输入邮箱地址"/>
-          </div>
-
-             <div class="form-group" style="text-align: center">
-                <input class="btn btn-primary" type="submit" value="提交" />
-                <input class="btn btn-default" type="reset" value="重置" />
-                <input class="btn btn-default" type="button" value="返回"/>
-             </div>
-        </form>
+            <input type="text" th:field="*{name}" class="form-control" id="name" name="name" readonly="readonly" placeholder="请输入姓名"/>
         </div>
-    </body>
+
+        <div class="form-group">
+            <label>性别：</label>
+            <input type="radio" name="gender" th:checked="*{gender=='0'}" value="0"/>男
+            <input type="radio" name="gender" th:checked="*{gender=='1'}" value="1"/>女
+        </div>
+
+        <div class="form-group">
+            <label for="age">年龄：</label>
+            <input type="text" th:field="*{age}" class="form-control" id="age" name="age" placeholder="请输入年龄"/>
+        </div>
+
+        <div class="form-group">
+            <label for="address">籍贯：</label>
+            <select name="address" class="form-control" th:field="*{region}">
+                <option value="1">广东</option>
+                <option value="2">广西</option>
+                <option value="3">湖南</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="qq">QQ：</label>
+            <input type="text" th:field="*{qq}" class="form-control" name="qq" placeholder="请输入QQ号码"/>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email：</label>
+            <input type="text"  th:field="*{email}"  class="form-control" name="email" placeholder="请输入邮箱地址"/>
+        </div>
+
+        <div class="form-group" style="text-align: center">
+            <input class="btn btn-primary" id="submit" value="提交" style="width: 54px;"/>
+            <input class="btn btn-default" type="reset" value="重置"/>
+            <input class="btn btn-default" id="back" type="button" value="返回"/>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+
+    var prefix = ctx + "port/user";
+
+    $("#form-user-edit").validate({
+        focusCleanup: true,
+        rules: {
+            name: {
+                required: true,
+                maxlength: 10,
+            },
+            age: {
+                required: true,
+                maxlength: 3,
+                number: true
+            },
+            qq: {
+                maxlength: 10,
+                number: true
+            },
+            email: {
+                maxlength: 50
+            }
+        }
+    });
+
+    $("#submit").bind("click", function () {
+        if ($.validate.form()) {
+            save(prefix + "/edit", $('#form-user-edit').serialize());
+        }
+    });
+
+    // 保存信息 刷新表格
+    function save(url, data) {
+        var config = {
+            url: url,
+            type: "post",
+            dataType: "json",
+            data: data,
+            beforeSend: function () {
+                $.modal.loading("正在处理中，请稍后...");
+                $.modal.disable();
+            },
+            success: function (result) {
+                successCallback(result);
+            }
+        };
+        $.ajax(config)
+    }
+
+    // 成功回调执行事件（父窗体静默更新）
+    function successCallback(result) {
+        if (result.code == web_status.SUCCESS) {
+
+            $.modal.msgSuccess(result.msg);
+            setTimeout(function () {
+                window.location.href = "/port/user/list";
+            }, 1000);
+
+        } else if (result.code == web_status.WARNING) {
+            $.modal.alertWarning(result.msg)
+        } else {
+            $.modal.alertError(result.msg);
+        }
+        $.modal.closeLoading();
+        $.modal.enable();
+    }
+
+    $("#back").bind("click", function () {
+        window.location.href = "/port/user/list";
+    })
+</script>
+</body>
 </html>

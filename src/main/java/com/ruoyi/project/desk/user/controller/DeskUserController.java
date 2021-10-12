@@ -88,12 +88,12 @@ public class DeskUserController extends BaseController
     /**
      * 修改用户管理
      */
-    @GetMapping("/edit/{id}")
+    @GetMapping("/editp/{id}")
     public String edit(@PathVariable("id") Long id, ModelMap mmap)
     {
         DeskUser deskUser = deskUserService.selectDeskUserById(id);
         mmap.put("deskUser", deskUser);
-        return prefix + "/edit";
+        return prefix + "/update";
     }
 
     /**

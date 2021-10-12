@@ -1,7 +1,7 @@
 <!-- HTML5文档-->
 <!DOCTYPE html>
 <!-- 网页使用的语言 -->
-<html lang="zh-CN">
+<html xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <!-- 指定字符集 -->
     <meta charset="utf-8">
@@ -15,16 +15,23 @@
     <title>添加用户</title>
 
     <!-- 1. 导入CSS的全局样式 -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <!--    <link href="css/bootstrap.min.css" rel="stylesheet">-->
     <!-- 2. jQuery导入，建议使用1.9以上的版本 -->
-    <script src="js/jquery-2.1.0.min.js"></script>
+    <script th:src="@{/js/jquery-2.1.0.min.js}"></script>
+    <!--    <script src="js/jquery-2.1.0.min.js"></script>-->
     <!-- 3. 导入bootstrap的js文件 -->
-    <script src="js/bootstrap.min.js"></script>
+    <script rel="stylesheet" th:src="@{/js/bootstrap.min.js}"></script>
+    <style>
+        .error {
+            color: #ff0000;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
     <center><h3>添加联系人页面</h3></center>
-    <form action="" method="post">
+    <form id="form-user-add">
         <div class="form-group">
             <label for="name">姓名：</label>
             <input type="text" class="form-control" id="name" name="name" placeholder="请输入姓名">
@@ -32,8 +39,8 @@
 
         <div class="form-group">
             <label>性别：</label>
-            <input type="radio" name="sex" value="男" checked="checked"/>男
-            <input type="radio" name="sex" value="女"/>女
+            <input type="radio" name="gender" value="0" checked="checked"/>男
+            <input type="radio" name="gender" value="1"/>女
         </div>
 
         <div class="form-group">
@@ -43,10 +50,10 @@
 
         <div class="form-group">
             <label for="address">籍贯：</label>
-            <select name="address" class="form-control" id="jiguan">
-                <option value="广东">广东</option>
-                <option value="广西">广西</option>
-                <option value="湖南">湖南</option>
+            <select name="region" class="form-control" id="jiguan">
+                <option value="1">广东</option>
+                <option value="2">广西</option>
+                <option value="3">湖南</option>
             </select>
         </div>
 
@@ -61,11 +68,85 @@
         </div>
 
         <div class="form-group" style="text-align: center">
-            <input class="btn btn-primary" type="submit" value="提交" />
-            <input class="btn btn-default" type="reset" value="重置" />
-            <input class="btn btn-default" type="button" value="返回" />
+            <input class="btn btn-primary" id="submit" value="提交" style="width: 54px;"/>
+            <input class="btn btn-default" type="reset" value="重置"/>
+            <input class="btn btn-default" id="back" type="button" value="返回"/>
         </div>
     </form>
 </div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+
+    var prefix = ctx + "port/user";
+
+    $("#form-user-add").validate({
+        focusCleanup: true,
+        rules: {
+            name: {
+                required: true,
+                maxlength: 10,
+            },
+            age: {
+                required: true,
+                maxlength: 3,
+                number: true
+            },
+            qq: {
+                maxlength: 10,
+                number: true
+            },
+            email: {
+                maxlength: 50
+            }
+        }
+    });
+
+    $("#submit").bind("click", function () {
+        if ($.validate.form()) {
+            save(prefix + "/add", $('#form-user-add').serialize());
+        }
+    });
+
+    // 保存信息 刷新表格
+    function save(url, data) {
+        var config = {
+            url: url,
+            type: "post",
+            dataType: "json",
+            data: data,
+            beforeSend: function () {
+                $.modal.loading("正在处理中，请稍后...");
+                $.modal.disable();
+            },
+            success: function (result) {
+                successCallback(result);
+            }
+        };
+        $.ajax(config)
+    }
+
+    // 成功回调执行事件（父窗体静默更新）
+    function successCallback(result) {
+        if (result.code == web_status.SUCCESS) {
+
+            $.modal.msgSuccess(result.msg);
+            setTimeout(function () {
+                window.location.href = "/port/user/list";
+            }, 1000);
+
+        } else if (result.code == web_status.WARNING) {
+            $.modal.alertWarning(result.msg)
+        } else {
+            $.modal.alertError(result.msg);
+        }
+        $.modal.closeLoading();
+        $.modal.enable();
+    }
+
+    $("#back").bind("click", function () {
+        window.location.href = "/port/user/list";
+    })
+
+</script>
 </body>
 </html>
